@@ -1,3 +1,4 @@
+
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 # See https://github.com/discourse/discourse/blob/master/docs/VAGRANT.md
@@ -18,6 +19,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |v|
     # This setting gives the VM 1024MB of RAM instead of the default 384.
     v.customize ["modifyvm", :id, "--memory", [ENV['DISCOURSE_VM_MEM'].to_i, 1024].max]
+    v.gui = true
 
     # Who has a single core cpu these days anyways?
     cpu_count = 2
@@ -41,7 +43,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.network :forwarded_port, guest: 3000, host: 4000
   config.vm.network :forwarded_port, guest: 1080, host: 4080 # Mailcatcher
-
+  config.vm.provision :shell, path: "bootstrap.sh"
+  
   nfs_setting = RUBY_PLATFORM =~ /darwin/ || RUBY_PLATFORM =~ /linux/
   config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", :nfs => nfs_setting
 
